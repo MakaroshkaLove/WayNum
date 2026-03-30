@@ -86,26 +86,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div style={{ marginTop: 24, borderTop: '1px solid var(--border)', paddingTop: 20 }}>
-          <div className="text-sm text-muted" style={{ marginBottom: 10, fontWeight: 600 }}>Тестові акаунти:</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {[
-              { label: '👑 Адмін', login: 'admin', pass: 'admin123' },
-              { label: '🏪 Магазин 1', login: 'cashier1', pass: 'cashier1' },
-              { label: '🏪 Магазин 2', login: 'cashier2', pass: 'cashier2' },
-            ].map(acc => (
-              <button
-                key={acc.login}
-                type="button"
-                className="btn btn-secondary btn-sm"
-                style={{ justifyContent: 'flex-start', fontFamily: 'inherit' }}
-                onClick={() => setForm({ username: acc.login, password: acc.pass })}
-              >
-                {acc.label} — <span className="font-mono" style={{ color: 'var(--accent)' }}>{acc.login}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+
       </div>
     </div>
   );

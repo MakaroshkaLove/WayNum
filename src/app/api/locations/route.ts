@@ -26,3 +26,25 @@ export async function POST(request: Request) {
 
   return NextResponse.json(location, { status: 201 });
 }
+
+export async function DELETE(request: Request) {
+  const session = await getSession();
+  if (!session || session.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  if (!id) return NextResponse.json({ error: 'No ID provided' }, { status: 400 });
+
+  try {
+    const locId = parseInt(id);
+    if (locId === 1) {
+      return NextResponse.json({ error: 'Не можна видалити Головний склад, оскільки це базова системна локація.' }, { status: 400 });
+    }
+    await prisma.location.delete({ where: { id: locId } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Неможливо видалити точку, на якій є товар в наявності або транзакції (чеки).' }, { status: 400 });
+  }
+}

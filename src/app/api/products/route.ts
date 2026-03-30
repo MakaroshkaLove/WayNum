@@ -5,12 +5,12 @@ import { getSession } from '@/lib/auth';
 export async function GET(request: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  
+
   const { searchParams } = new URL(request.url);
   const locationId = searchParams.get('locationId');
 
-  const products = await prisma.product.findMany({ 
-    include: { 
+  const products = await prisma.product.findMany({
+    include: {
       category: true,
       items: {
         where: {
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
         select: { quantity: true }
       }
     },
-    orderBy: { id: 'desc' } 
+    orderBy: { id: 'desc' }
   });
 
   const mapped = products.map((p: any) => {
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
     return { ...rest, stockCount };
   });
 
-  const filtered = locationId 
+  const filtered = locationId
     ? mapped.filter(p => p.stockCount > 0)
     : mapped;
 
@@ -99,23 +99,23 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: 'ID обов\'язковий' }, { status: 400 });
 
   try {
-    // 1. Отримуємо всі Item IDs цього продукту
+
     const items = await prisma.item.findMany({ where: { productId: parseInt(id) }, select: { id: true } });
     const itemIds = items.map(i => i.id);
 
     if (itemIds.length > 0) {
-      // 2. Видаляємо всі зв'язки з чеками (TransactionItem), де були ці товари
+
       await prisma.transactionItem.deleteMany({
         where: { itemId: { in: itemIds } }
       });
 
-      // 3. Видаляємо самі фізичні товари (Items) зі складу
+
       await prisma.item.deleteMany({
         where: { productId: parseInt(id) }
       });
     }
 
-    // 4. Тепер безпечно видаляємо сам продукт
+
     await prisma.product.delete({ where: { id: parseInt(id) } });
     return NextResponse.json({ success: true });
   } catch (error) {

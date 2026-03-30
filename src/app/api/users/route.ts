@@ -46,3 +46,21 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ id: user.id, username: user.username, role: user.role }, { status: 201 });
 }
+
+export async function DELETE(request: Request) {
+  const session = await getSession();
+  if (!session || session.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  if (!id) return NextResponse.json({ error: 'No ID provided' }, { status: 400 });
+
+  try {
+    await prisma.user.delete({ where: { id: parseInt(id) } });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json({ error: 'Не можна видалити співробітника, що вже має історію продажів (чеки).' }, { status: 400 });
+  }
+}

@@ -50,6 +50,19 @@ export default function SettingsPage() {
     }
   }
 
+  async function deleteLocation(id: number) {
+    if (!confirm('Ви дійсно хочете видалити цю точку продажу? Це неможливо відмінити.')) return;
+    setLocMsg('');
+    const r = await fetch(`/api/locations?id=${id}`, { method: 'DELETE' });
+    if (r.ok) {
+      setLocMsg('✅ Точку успішно видалено');
+      loadAll();
+    } else {
+      const d = await r.json();
+      setLocMsg('❌ ' + d.error);
+    }
+  }
+
   async function addUser() {
     setUserMsg('');
     const r = await fetch('/api/users', {
@@ -64,6 +77,19 @@ export default function SettingsPage() {
     } else {
       const d = await r.json();
       setUserMsg('Помилка: ' + d.error);
+    }
+  }
+
+  async function deleteUser(id: number) {
+    if (!confirm('Ви дійсно хочете видалити цього співробітника?')) return;
+    setUserMsg('');
+    const r = await fetch(`/api/users?id=${id}`, { method: 'DELETE' });
+    if (r.ok) {
+      setUserMsg('✅ Користувача успішно видалено');
+      loadAll();
+    } else {
+      const d = await r.json();
+      setUserMsg('❌ ' + d.error);
     }
   }
 
@@ -108,7 +134,12 @@ export default function SettingsPage() {
                     <div style={{ fontWeight: 600 }}>{l.name}</div>
                     <div className="text-sm text-muted">{l.type === 'WAREHOUSE' ? 'Склад' : 'Магазин'}</div>
                   </div>
-                  <span className={`badge ${l.type === 'WAREHOUSE' ? 'badge-purple' : 'badge-blue'}`}>#{l.id}</span>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <span className={`badge ${l.type === 'WAREHOUSE' ? 'badge-purple' : 'badge-blue'}`}>#{l.id}</span>
+                    {l.id !== 1 && (
+                      <button className="btn btn-danger btn-sm" onClick={() => deleteLocation(l.id)}>Видалити</button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -186,9 +217,16 @@ export default function SettingsPage() {
                     <div style={{ fontWeight: 600 }}>{u.username}</div>
                     <div className="text-sm text-muted">{u.location?.name || 'Без точки'}</div>
                   </div>
-                  <span className={`badge ${u.role === 'ADMIN' ? 'badge-yellow' : 'badge-green'}`}>
-                    {u.role === 'ADMIN' ? 'Адмін' : 'Касир'}
-                  </span>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                    <span className={`badge ${u.role === 'ADMIN' ? 'badge-yellow' : 'badge-green'}`}>
+                      {u.role === 'ADMIN' ? 'Адмін' : 'Касир'}
+                    </span>
+                    {u.role !== 'ADMIN' && (
+                      <button className="btn btn-danger btn-sm" onClick={() => deleteUser(u.id)}>
+                        Видалити
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
