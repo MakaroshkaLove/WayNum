@@ -6,7 +6,7 @@ export default async function DashboardPage() {
   const session = await getSession();
   if (!session) redirect('/login');
 
-  const isAdmin = session.role === 'ADMIN';
+  const isFullAccess = session.role === 'ADMIN' || (session.permissions || []).includes('dashboard');
 
   const [itemsInStock, transactions, locations] = await Promise.all([
     prisma.item.findMany({ where: { status: 'IN_STOCK' } }),
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
 
       <div className="page-body">
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: isAdmin ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isFullAccess ? 'repeat(4, 1fr)' : 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
           <div className="stat-card">
             <div className="stat-icon purple">#</div>
             <div>
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
               <div className="stat-label">Обіг продажів</div>
             </div>
           </div>
-          {isAdmin && (
+          {isFullAccess && (
             <div className="stat-card">
               <div className="stat-icon yellow">₴</div>
               <div>
@@ -80,7 +80,7 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {isAdmin && (
+        {isFullAccess && (
           <div className="card" style={{ marginBottom: 20 }}>
             <div className="card-body" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>

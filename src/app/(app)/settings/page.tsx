@@ -19,7 +19,9 @@ export default function SettingsPage() {
     { id: 'products', label: 'Товарна база' },
     { id: 'receive', label: 'Прийом товару' },
     { id: 'transfer', label: 'Переміщення' },
-    { id: 'clients', label: 'Клієнти' }
+    { id: 'clients', label: 'Клієнти' },
+    { id: 'dashboard', label: 'Дашборд (Капітал і Прибуток)' },
+    { id: 'categories', label: 'Управління категоріями' }
   ];
 
   async function loadAll() {

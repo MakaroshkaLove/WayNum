@@ -12,7 +12,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const session = await getSession();
-  if (!session || session.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!session || (session.role !== 'ADMIN' && !(session.permissions || []).includes('categories'))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await request.json();
   if (!body.name) return NextResponse.json({ error: 'Назва обов\'язкова' }, { status: 400 });
@@ -33,7 +35,9 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const session = await getSession();
-  if (!session || session.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!session || (session.role !== 'ADMIN' && !(session.permissions || []).includes('categories'))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const url = new URL(request.url);
   const id = url.searchParams.get('id');
